@@ -1,0 +1,316 @@
+OBJECT Report 88400 Cust Remove CR-LF etc.
+{
+  OBJECT-PROPERTIES
+  {
+    Date=18-06-13;
+    Time=11:54:17;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    ProcessingOnly=Yes;
+  }
+  DATAITEMS
+  {
+    { PROPERTIES
+      {
+        DataItemTable=Table18;
+        OnPreDataItem=BEGIN
+                        IF COUNT > 1 THEN
+                          ERROR(Text001);
+                      END;
+
+        OnAfterGetRecord=VAR
+                           Customer2@1000000001 : Record 18;
+                           RecRef@1000000000 : RecordRef;
+                         BEGIN
+                           Customer2 := Customer;
+                           RecRef.GETTABLE(Customer2);
+                           RemoveCharFromRecRef(RecRef)
+                         END;
+
+        ReqFilterFields=No.;
+      }
+      SECTIONS
+      {
+        { PROPERTIES
+          {
+            SectionType=Body;
+            SectionWidth=12000;
+            SectionHeight=846;
+          }
+          CONTROLS
+          {
+          }
+           }
+      }
+       }
+  }
+  REQUESTFORM
+  {
+    PROPERTIES
+    {
+      Width=9020;
+      Height=3410;
+    }
+    CONTROLS
+    {
+    }
+  }
+  CODE
+  {
+    VAR
+      Text001@1000000000 : TextConst 'DAN=Kun 1 ad gangen!;ENU=Only one at a time!';
+
+    PROCEDURE SetRecRef@1000000000();
+    BEGIN
+    END;
+
+    PROCEDURE RemoveCharFromRecRef@1000000001(VAR RecRef@1000000000 : RecordRef);
+    VAR
+      Fld@1000000003 : Record 2000000041;
+      FldRef@1000000002 : FieldRef;
+      VarTmp@1000000004 : Variant;
+      i@1000000001 : Integer;
+      j@1000000008 : Integer;
+      CharTmp@1000000005 : Char;
+      CharTmp2@1000000009 : Char;
+      CodeTmp@1000000006 : Code[1024];
+      TextTmp@1000000007 : Text[1024];
+      TextTmp2@1000000011 : Text[1024];
+      ModifyRec@1000000012 : Boolean;
+    BEGIN
+      FOR i := 1 TO RecRef.FIELDCOUNT DO BEGIN
+        FldRef := RecRef.FIELDINDEX(i);
+        CASE FORMAT(FldRef.TYPE) OF
+          'Char' :
+            BEGIN
+              CLEAR(CharTmp2);
+              CharTmp := FldRef.VALUE;
+              IF NOT RemoveTheChar(CharTmp) THEN
+                CharTmp2 := CharTmp
+              ELSE
+                ModifyRec := TRUE;
+              IF CharTmp <> CharTmp2 THEN
+                FldRef.VALUE := CharTmp2;
+            END;
+          'Text' :
+            BEGIN
+              CLEAR(TextTmp2);
+              TextTmp := FldRef.VALUE;
+              FOR j := 1 TO STRLEN(TextTmp) DO BEGIN
+                EVALUATE(CharTmp,COPYSTR(TextTmp,j,1));
+                IF NOT RemoveTheChar(CharTmp) THEN
+                  //TextTmp2 := TextTmp2 + FORMAT(CharTmp)
+                  TextTmp2 := TextTmp2 + COPYSTR(TextTmp,j,1)
+                ELSE
+                  ModifyRec := TRUE;
+              END;
+              IF TextTmp <> TextTmp2 THEN
+                FldRef.VALUE := TextTmp2;
+            END;
+          'Code' :
+            BEGIN
+              CLEAR(TextTmp2);
+              CodeTmp := FldRef.VALUE;
+              FOR j := 1 TO STRLEN(CodeTmp) DO BEGIN
+                EVALUATE(CharTmp,COPYSTR(CodeTmp,j,1));
+                IF NOT RemoveTheChar(CharTmp) THEN
+                  //CodeTmp2 := CodeTmp2 + FORMAT(CharTmp)
+                  TextTmp2 := TextTmp2 + COPYSTR(CodeTmp,j,1)
+                ELSE
+                  ModifyRec := TRUE;
+              END;
+              IF CodeTmp <> UPPERCASE(TextTmp2) THEN
+                FldRef.VALUE := UPPERCASE(TextTmp2);
+            END;
+        END;
+      END;
+
+      IF ModifyRec THEN
+        RecRef.MODIFY(FALSE);
+    END;
+
+    PROCEDURE RemoveTheChar@1000000002(VAR CharTmp@1000000000 : Char) : Boolean;
+    VAR
+      IntTmp@1000000001 : Integer;
+    BEGIN
+      IntTmp := CharTmp;
+      CASE IntTmp OF
+        9: EXIT(TRUE);
+        10: EXIT(TRUE);
+        13: EXIT(TRUE);
+      END;
+      EXIT(FALSE);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+
+OBJECT Report 88401 SH SL Remove CR-LF etc.
+{
+  OBJECT-PROPERTIES
+  {
+    Date=18-06-13;
+    Time=11:59:49;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    ProcessingOnly=Yes;
+  }
+  DATAITEMS
+  {
+    { PROPERTIES
+      {
+        DataItemTable=Table36;
+        OnPreDataItem=BEGIN
+                        IF COUNT > 1 THEN
+                          ERROR(Text001);
+                      END;
+
+        OnAfterGetRecord=VAR
+                           SalesHeader2@1000000001 : Record 36;
+                           RecRef@1000000000 : RecordRef;
+                         BEGIN
+                           SalesHeader2 := "Sales Header";
+                           RecRef.GETTABLE(SalesHeader2);
+                           RemoveCharFromRecRef(RecRef)
+                         END;
+
+        ReqFilterFields=Document Type,No.;
+      }
+      SECTIONS
+      {
+      }
+       }
+    { PROPERTIES
+      {
+        DataItemIndent=1;
+        DataItemTable=Table37;
+        DataItemTableView=SORTING(Document Type,Document No.,Line No.)
+                          ORDER(Ascending);
+        OnAfterGetRecord=VAR
+                           SalesLine2@1000000000 : Record 37;
+                           RecRef@1000000001 : RecordRef;
+                         BEGIN
+                           SalesLine2 := "Sales Line";
+                           RecRef.GETTABLE(SalesLine2);
+                           RemoveCharFromRecRef(RecRef)
+                         END;
+
+        DataItemLink=Document Type=FIELD(Document Type),
+                     Document No.=FIELD(No.);
+      }
+      SECTIONS
+      {
+      }
+       }
+  }
+  REQUESTFORM
+  {
+    PROPERTIES
+    {
+      Width=9020;
+      Height=3410;
+    }
+    CONTROLS
+    {
+    }
+  }
+  CODE
+  {
+    VAR
+      Text001@1000000000 : TextConst 'DAN=Kun 1 ad gangen!;ENU=Only one at a time!';
+
+    PROCEDURE SetRecRef@1000000000();
+    BEGIN
+    END;
+
+    PROCEDURE RemoveCharFromRecRef@1000000001(VAR RecRef@1000000000 : RecordRef);
+    VAR
+      Fld@1000000003 : Record 2000000041;
+      FldRef@1000000002 : FieldRef;
+      VarTmp@1000000004 : Variant;
+      i@1000000001 : Integer;
+      j@1000000008 : Integer;
+      CharTmp@1000000005 : Char;
+      CharTmp2@1000000009 : Char;
+      CodeTmp@1000000006 : Code[1024];
+      TextTmp@1000000007 : Text[1024];
+      TextTmp2@1000000011 : Text[1024];
+      ModifyRec@1000000012 : Boolean;
+    BEGIN
+      FOR i := 1 TO RecRef.FIELDCOUNT DO BEGIN
+        FldRef := RecRef.FIELDINDEX(i);
+        CASE FORMAT(FldRef.TYPE) OF
+          'Char' :
+            BEGIN
+              CLEAR(CharTmp2);
+              CharTmp := FldRef.VALUE;
+              IF NOT RemoveTheChar(CharTmp) THEN
+                CharTmp2 := CharTmp
+              ELSE
+                ModifyRec := TRUE;
+              IF CharTmp <> CharTmp2 THEN
+                FldRef.VALUE := CharTmp2;
+            END;
+          'Text' :
+            BEGIN
+              CLEAR(TextTmp2);
+              TextTmp := FldRef.VALUE;
+              FOR j := 1 TO STRLEN(TextTmp) DO BEGIN
+                EVALUATE(CharTmp,COPYSTR(TextTmp,j,1));
+                IF NOT RemoveTheChar(CharTmp) THEN
+                  //TextTmp2 := TextTmp2 + FORMAT(CharTmp)
+                  TextTmp2 := TextTmp2 + COPYSTR(TextTmp,j,1)
+                ELSE
+                  ModifyRec := TRUE;
+              END;
+              IF TextTmp <> TextTmp2 THEN
+                FldRef.VALUE := TextTmp2;
+            END;
+          'Code' :
+            BEGIN
+              CLEAR(TextTmp2);
+              CodeTmp := FldRef.VALUE;
+              FOR j := 1 TO STRLEN(CodeTmp) DO BEGIN
+                EVALUATE(CharTmp,COPYSTR(CodeTmp,j,1));
+                IF NOT RemoveTheChar(CharTmp) THEN
+                  //CodeTmp2 := CodeTmp2 + FORMAT(CharTmp)
+                  TextTmp2 := TextTmp2 + COPYSTR(CodeTmp,j,1)
+                ELSE
+                  ModifyRec := TRUE;
+              END;
+              IF CodeTmp <> UPPERCASE(TextTmp2) THEN
+                FldRef.VALUE := UPPERCASE(TextTmp2);
+            END;
+        END;
+      END;
+
+      IF ModifyRec THEN
+        RecRef.MODIFY(FALSE);
+    END;
+
+    PROCEDURE RemoveTheChar@1000000002(VAR CharTmp@1000000000 : Char) : Boolean;
+    VAR
+      IntTmp@1000000001 : Integer;
+    BEGIN
+      IntTmp := CharTmp;
+      CASE IntTmp OF
+        9: EXIT(TRUE);
+        10: EXIT(TRUE);
+        13: EXIT(TRUE);
+      END;
+      EXIT(FALSE);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

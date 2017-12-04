@@ -1,0 +1,190 @@
+OBJECT Form 60047 Reg Whse. Activity List Undo
+{
+  OBJECT-PROPERTIES
+  {
+    Date=19-03-14;
+    Time=10:36:08;
+    Modified=Yes;
+    Version List=RNIE-TMP,C2-1.15;
+  }
+  PROPERTIES
+  {
+    Width=10340;
+    Height=6710;
+    Editable=No;
+    CaptionML=[DAN=Reg. lageraktivitetsoversigt;
+               DEU=Registr. Lagerakt. �bersicht;
+               ENU=Registered Whse. Activity List;
+               ESP=Lista actividad alm. regis.;
+               FRA=Liste activit�s entrep. enreg.;
+               ITA=Lista attivit� whse. registrata];
+    TableBoxID=1;
+    SourceTable=Table5772;
+    SourceTableView=SORTING(Type,No.)
+                    ORDER(Ascending)
+                    WHERE(Type=CONST(Pick));
+    OnFindRecord=BEGIN
+                   IF FIND(Which) THEN BEGIN
+
+                     RegisteredWhseActivHeader := Rec;
+                     WHILE TRUE DO
+                       IF WMSManagement.LocationIsAllowed("Location Code") THEN
+                         EXIT(TRUE)
+                       ELSE
+                         IF NEXT(1) = 0 THEN BEGIN
+
+                           Rec := RegisteredWhseActivHeader;
+                           IF FIND(Which) THEN
+                             WHILE TRUE DO
+                               IF WMSManagement.LocationIsAllowed("Location Code") THEN
+                                 EXIT(TRUE)
+                               ELSE
+                                 IF NEXT(-1) = 0 THEN
+                                   EXIT(FALSE);
+                         END;
+                   END;
+                   EXIT(FALSE);
+                 END;
+
+    OnNextRecord=VAR
+                   RealSteps@1001 : Integer;
+                   NextSteps@1000 : Integer;
+                 BEGIN
+                   IF Steps = 0 THEN
+                     EXIT;
+
+                   RegisteredWhseActivHeader := Rec;
+                   REPEAT
+                     NextSteps := NEXT(Steps/ABS(Steps));
+                     IF WMSManagement.LocationIsAllowed("Location Code") THEN BEGIN
+                       RealSteps := RealSteps + NextSteps;
+                       RegisteredWhseActivHeader := Rec;
+                     END;
+                   UNTIL (NextSteps = 0) OR (RealSteps = Steps);
+                   Rec := RegisteredWhseActivHeader;
+                   FIND;
+                   EXIT(RealSteps);
+                 END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           CurrForm.CAPTION := FormCaption;
+                         END;
+
+  }
+  CONTROLS
+  {
+    { 1   ;TableBox     ;220  ;220  ;9900 ;5500 ;HorzGlue=Both;
+                                                 VertGlue=Both }
+    { 18  ;TextBox      ;0    ;1650 ;550  ;440  ;Visible=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr=Type }
+    { 20  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=18;
+                                                 InColumnHeading=Yes }
+    { 8   ;TextBox      ;979  ;1430 ;1650 ;440  ;ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="No." }
+    { 9   ;Label        ;0    ;0    ;0    ;0    ;ParentControl=8;
+                                                 InColumnHeading=Yes }
+    { 2   ;TextBox      ;979  ;440  ;1650 ;440  ;ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Whse. Activity No." }
+    { 3   ;Label        ;0    ;0    ;0    ;0    ;ParentControl=2;
+                                                 InColumnHeading=Yes }
+    { 4   ;TextBox      ;0    ;0    ;1650 ;0    ;ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Location Code" }
+    { 5   ;Label        ;0    ;0    ;0    ;0    ;ParentControl=4;
+                                                 InColumnHeading=Yes }
+    { 15  ;TextBox      ;4286 ;2970 ;1650 ;440  ;ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Assigned User ID" }
+    { 16  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=15;
+                                                 InColumnHeading=Yes }
+    { 6   ;TextBox      ;0    ;0    ;550  ;0    ;ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Sorting Method" }
+    { 7   ;Label        ;0    ;0    ;0    ;0    ;ParentControl=6;
+                                                 InColumnHeading=Yes }
+    { 10  ;TextBox      ;0    ;0    ;1650 ;0    ;ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="No. Series" }
+    { 11  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=10;
+                                                 InColumnHeading=Yes }
+    { 12  ;CommandButton;660  ;5940 ;2200 ;550  ;HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 Default=Yes;
+                                                 PushAction=LookupOK;
+                                                 InvalidActionAppearance=Hide }
+    { 13  ;CommandButton;3080 ;5940 ;2200 ;550  ;HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 Cancel=Yes;
+                                                 PushAction=LookupCancel;
+                                                 InvalidActionAppearance=Hide }
+    { 14  ;CommandButton;7920 ;5940 ;2200 ;550  ;HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 PushAction=FormHelp }
+    { 17  ;MenuButton   ;5500 ;5940 ;2200 ;550  ;HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 CaptionML=[DAN=&Linje;
+                                                            DEU=&Zeile;
+                                                            ENU=&Line;
+                                                            ESP=&L�nea;
+                                                            FRA=&Ligne;
+                                                            ITA=Ri&ga];
+                                                 Menu=MENUITEMS
+                                                 {
+                                                   { ID=19;
+                                                     ShortCutKey=Shift+F5;
+                                                     CaptionML=[DAN=Kort;
+                                                                DEU=Karte;
+                                                                ENU=Card;
+                                                                ESP=Ficha;
+                                                                FRA=Fiche;
+                                                                ITA=Scheda];
+                                                     OnPush=BEGIN
+                                                              CASE Type OF
+                                                                Type::"Put-away":
+                                                                  ERROR('Only Pick');
+                                                                Type::Pick:
+                                                                  FORM.RUN(FORM::"Registered Pick Undo",Rec);
+                                                                Type::Movement:
+                                                                  ERROR('Only Pick');
+                                                              END;
+                                                            END;
+                                                             }
+                                                 }
+                                                  }
+  }
+  CODE
+  {
+    VAR
+      RegisteredWhseActivHeader@1001 : Record 5772;
+      WMSManagement@1000 : Codeunit 7302;
+      Text000@1003 : TextConst 'DAN=Reg. l�g-p�-lager-oversigt (log.);DEU=Registr. Einlagerungs�bersicht;ENU=Registered Whse. Put-away List;ESP=Lista ubic. alm. registrado;FRA=Liste rangements entrep. enreg.;ITA=Lista stoccaggio whse. registrata';
+      Text001@1002 : TextConst 'DAN=Reg. plukliste (logistik);DEU=Registr. Kommissionier�bers.;ENU=Registered Whse. Pick List;ESP=Lista pick. alm. registrado;FRA=Liste pr�l�vements entrep. enreg.;ITA=Lista prelievi whse. registrati';
+      Text002@1004 : TextConst 'DAN=Reg. bev�gelsesoversigt (logistik);DEU=Regist. Lag.-Pl.-Umlag.-�bers.;ENU=Registered Whse. Movement List;ESP=Lista mov. alm. registrado;FRA=Liste mouvements entrep. enreg.;ITA=Lista mov. whse. registrata';
+      Text003@1005 : TextConst 'DAN=Reg. lageraktivitetsoversigt;DEU=Registr. Lagerakt. �bersicht;ENU=Registered Whse. Activity List;ESP=Lista actividad alm. regis.;FRA=Liste activit�s entrep. enreg.;ITA=Lista attivit� whse. registrata';
+
+    LOCAL PROCEDURE FormCaption@1() : Text[250];
+    BEGIN
+      CASE Type OF
+        Type::"Put-away":
+          EXIT(Text000);
+        Type::Pick:
+          EXIT(Text001);
+        Type::Movement:
+          EXIT(Text002);
+        ELSE
+          EXIT(Text003);
+      END;
+    END;
+
+    BEGIN
+    {
+      C2-1.15 - FMO  - 18.03.14 : CR-070 New form.
+    }
+    END.
+  }
+}
+

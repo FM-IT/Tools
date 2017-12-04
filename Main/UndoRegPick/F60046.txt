@@ -1,0 +1,200 @@
+OBJECT Form 60046 Registered Pick Subform Undo
+{
+  OBJECT-PROPERTIES
+  {
+    Date=19-03-14;
+    Time=10:30:52;
+    Modified=Yes;
+    Version List=RNIE-TMP,C2-1.15;
+  }
+  PROPERTIES
+  {
+    Width=16060;
+    Height=3300;
+    CaptionML=[DAN=Registreret pluk - underform.;
+               DEU=Registr. Kommiss. Subform;
+               ENU=Registered Pick Subform;
+               ESP=Subform. picking registrado;
+               FRA=Sous-form. pr�l�vement enreg.;
+               ITA=Subform prelievo registrato];
+    MultipleNewLines=Yes;
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    TableBoxID=1;
+    LinksAllowed=No;
+    SourceTable=Table5773;
+    AutoSplitKey=Yes;
+    DelayedInsert=Yes;
+  }
+  CONTROLS
+  {
+    { 1   ;TableBox     ;0    ;0    ;16060;3300 ;HorzGlue=Both;
+                                                 VertGlue=Both }
+    { 12  ;TextBox      ;741  ;1100 ;550  ;440  ;Visible=No;
+                                                 Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Action Type" }
+    { 13  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=12;
+                                                 InColumnHeading=Yes }
+    { 2   ;TextBox      ;0    ;220  ;550  ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Source Document" }
+    { 3   ;Label        ;0    ;0    ;0    ;0    ;ParentControl=2;
+                                                 InColumnHeading=Yes }
+    { 6   ;TextBox      ;4253 ;660  ;1650 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Source No." }
+    { 7   ;Label        ;0    ;0    ;0    ;0    ;ParentControl=6;
+                                                 InColumnHeading=Yes }
+    { 62  ;TextBox      ;11483;220  ;1650 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Due Date" }
+    { 63  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=62;
+                                                 InColumnHeading=Yes }
+    { 14  ;TextBox      ;1694 ;110  ;1700 ;440  ;Visible=No;
+                                                 Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Serial No." }
+    { 15  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=14;
+                                                 InColumnHeading=Yes }
+    { 16  ;TextBox      ;3394 ;110  ;1700 ;440  ;Visible=No;
+                                                 Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Lot No." }
+    { 17  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=16;
+                                                 InColumnHeading=Yes }
+    { 1106000000;TextBox;6721 ;220  ;1700 ;440  ;Visible=No;
+                                                 Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Expiration Date" }
+    { 1106000001;Label  ;0    ;0    ;0    ;0    ;ParentControl=1106000000;
+                                                 InColumnHeading=Yes }
+    { 18  ;TextBox      ;14153;660  ;1650 ;440  ;Visible=No;
+                                                 Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Shelf No." }
+    { 19  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=18;
+                                                 InColumnHeading=Yes }
+    { 10  ;TextBox      ;6730 ;220  ;1650 ;440  ;Visible=No;
+                                                 Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Zone Code" }
+    { 11  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=10;
+                                                 InColumnHeading=Yes }
+    { 8   ;TextBox      ;5080 ;220  ;1650 ;440  ;Visible=No;
+                                                 Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Bin Code" }
+    { 9   ;Label        ;0    ;0    ;0    ;0    ;ParentControl=8;
+                                                 InColumnHeading=Yes }
+    { 22  ;TextBox      ;17453;660  ;1650 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Item No." }
+    { 23  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=22;
+                                                 InColumnHeading=Yes }
+    { 24  ;TextBox      ;19103;660  ;1650 ;440  ;Visible=No;
+                                                 Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Variant Code" }
+    { 25  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=24;
+                                                 InColumnHeading=Yes }
+    { 30  ;TextBox      ;24603;660  ;4400 ;440  ;HorzGlue=Both;
+                                                 Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr=Description }
+    { 31  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=30;
+                                                 InColumnHeading=Yes }
+    { 32  ;TextBox      ;29003;660  ;4400 ;440  ;Visible=No;
+                                                 Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Description 2" }
+    { 33  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=32;
+                                                 InColumnHeading=Yes }
+    { 4   ;TextBox      ;16802;220  ;1650 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr=Quantity }
+    { 5   ;Label        ;0    ;0    ;0    ;0    ;ParentControl=4;
+                                                 InColumnHeading=Yes }
+    { 1000000000;TextBox;27491;330  ;1650 ;440  ;ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Undo Quantity" }
+    { 1000000001;Label  ;0    ;0    ;0    ;0    ;ParentControl=1000000000;
+                                                 InColumnHeading=Yes }
+    { 26  ;TextBox      ;20753;660  ;1650 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InColumn=Yes;
+                                                 SourceExpr="Unit of Measure Code" }
+    { 27  ;Label        ;0    ;0    ;0    ;0    ;ParentControl=26;
+                                                 InColumnHeading=Yes }
+  }
+  CODE
+  {
+    VAR
+      WMSMgt@1000 : Codeunit 7302;
+
+    PROCEDURE ShowSourceLine@1();
+    BEGIN
+      WMSMgt.ShowSourceDocLine(
+        "Source Type","Source Subtype","Source No.","Source Line No.","Source Subline No.");
+    END;
+
+    PROCEDURE ShowBinContents@7301();
+    VAR
+      BinContent@1000 : Record 7302;
+    BEGIN
+      BinContent.ShowBinContents("Location Code","Item No.","Variant Code","Bin Code");
+    END;
+
+    PROCEDURE ShowWhseLine@3();
+    BEGIN
+      WMSMgt.ShowWhseDocLine(
+        "Whse. Document Type","Whse. Document No.","Whse. Document Line No.");
+    END;
+
+    PROCEDURE ShowPostedWhseShptLine@2();
+    BEGIN
+      WMSMgt.ShowPostedWhseShptLine("Whse. Document No.","Whse. Document Line No.");
+    END;
+
+    PROCEDURE ShowWhseEntries@4();
+    VAR
+      RegisteredWhseActivityHdr@1000 : Record 5772;
+    BEGIN
+      RegisteredWhseActivityHdr.GET("Activity Type","No.");
+      Rec.ShowWhseEntries(RegisteredWhseActivityHdr."Registering Date");
+    END;
+
+    PROCEDURE UndoRegWhsePick@1000000000();
+    VAR
+      RegisteredWhseActivityLine@1000000000 : Record 5773;
+    BEGIN
+      //>>C2-1.15
+      RegisteredWhseActivityLine.COPY(Rec);
+      CurrForm.SETSELECTIONFILTER(RegisteredWhseActivityLine);
+      CODEUNIT.RUN(CODEUNIT::"Undo Whse. Reg. Activity",RegisteredWhseActivityLine);
+      //<<C2-1.15
+    END;
+
+    BEGIN
+    {
+      C2-1.15 - FMO  - 18.03.14 : CR-070 New form.
+    }
+    END.
+  }
+}
+

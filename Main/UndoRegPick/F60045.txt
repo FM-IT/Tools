@@ -1,0 +1,299 @@
+OBJECT Form 60045 Registered Pick Undo
+{
+  OBJECT-PROPERTIES
+  {
+    Date=19-03-14;
+    Time=10:35:51;
+    Modified=Yes;
+    Version List=RNIE-TMP,C2-1.15;
+  }
+  PROPERTIES
+  {
+    Width=16500;
+    Height=8580;
+    CaptionML=[DAN=Registreret pluk;
+               DEU=Registrierte Kommissionierung;
+               ENU=Registered Pick;
+               ESP=Picking registrado;
+               FRA=Pr�l�vement enregistr�;
+               ITA=Prelievo registrato];
+    InsertAllowed=No;
+    SourceTable=Table5772;
+    UpdateOnActivate=Yes;
+    SourceTableView=SORTING(Type,No.)
+                    ORDER(Ascending)
+                    WHERE(Type=CONST(Pick));
+    OnOpenForm=VAR
+                 ChangeLocation@1000 : Boolean;
+               BEGIN
+                 ChangeLocation := "Location Code" <> CurrentLocationCode;
+                 CurrentLocationCode := "Location Code";
+                 OpenRegisteredActivityHeader(2,ChangeLocation,CurrentLocationCode,Rec);
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       SETRANGE("No.");
+                       CurrentLocationCode := "Location Code";
+                     END;
+
+  }
+  CONTROLS
+  {
+    { 1   ;TabControl   ;220  ;220  ;16060;3850 ;HorzGlue=Both;
+                                                 PageNamesML=[DAN=Generelt;
+                                                              DEU=Allgemein;
+                                                              ENU=General;
+                                                              ESP=General;
+                                                              FRA=G�n�ral;
+                                                              ITA=Generale] }
+    { 30  ;PictureBox   ;6710 ;990  ;440  ;440  ;Focusable=No;
+                                                 ParentControl=1;
+                                                 InPage=0;
+                                                 Border=No;
+                                                 BitmapList=7,6;
+                                                 CaptionML=[DAN=Bem�rkning;
+                                                            DEU=Bemerkung;
+                                                            ENU=Comment;
+                                                            ESP=Comentario;
+                                                            FRA=Commentaires;
+                                                            ITA=Commento];
+                                                 SourceExpr=Comment }
+    { 12  ;TextBox      ;12980;2750 ;2750 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InPage=0;
+                                                 NextControl=97;
+                                                 SourceExpr="Sorting Method" }
+    { 13  ;Label        ;9570 ;2750 ;3300 ;440  ;ParentControl=12 }
+    { 8   ;TextBox      ;12980;990  ;2750 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InPage=0;
+                                                 NextControl=12;
+                                                 SourceExpr="Assigned User ID" }
+    { 14  ;Label        ;9570 ;990  ;3300 ;440  ;ParentControl=8 }
+    { 15  ;TextBox      ;12980;1540 ;1650 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Assignment Date" }
+    { 22  ;Label        ;9570 ;1540 ;3300 ;440  ;ParentControl=15 }
+    { 23  ;TextBox      ;12980;2090 ;1650 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Assignment Time" }
+    { 24  ;Label        ;9570 ;2090 ;3300 ;440  ;ParentControl=23 }
+    { 28  ;TextBox      ;3850 ;2090 ;2750 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Location Code" }
+    { 29  ;Label        ;440  ;2090 ;3300 ;440  ;ParentControl=28 }
+    { 4   ;TextBox      ;3850 ;990  ;2750 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="No." }
+    { 5   ;Label        ;440  ;990  ;3300 ;440  ;ParentControl=4 }
+    { 7   ;TextBox      ;3850 ;1540 ;2750 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Whse. Activity No." }
+    { 9   ;Label        ;440  ;1540 ;3300 ;440  ;ParentControl=7 }
+    { 2   ;TextBox      ;12980;3410 ;1650 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="No. Printed" }
+    { 3   ;Label        ;9570 ;3410 ;3300 ;440  ;ParentControl=2 }
+    { 25  ;TextBox      ;3850 ;2750 ;1700 ;440  ;Editable=No;
+                                                 ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Registering Date" }
+    { 26  ;Label        ;440  ;2750 ;3300 ;440  ;ParentControl=25 }
+    { 27  ;CommandButton;6710 ;990  ;440  ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 ShowCaption=No;
+                                                 BackTransparent=Yes;
+                                                 PushAction=RunObject;
+                                                 CaptionML=[DAN=Bem�rkning;
+                                                            DEU=Bemerkung;
+                                                            ENU=Comment;
+                                                            ESP=Comentario;
+                                                            FRA=Commentaires;
+                                                            ITA=Commento];
+                                                 ToolTipML=[DAN=Bem�rkning;
+                                                            DEU=Bemerkung;
+                                                            ENU=Comment;
+                                                            ESP=Comentario;
+                                                            FRA=Commentaires;
+                                                            ITA=Commento];
+                                                 RunObject=Form 5776;
+                                                 RunFormLinkType=OnUpdate;
+                                                 RunFormLink=Table Name=CONST(Rgstrd. Whse. Activity Header),
+                                                             Type=FIELD(Type),
+                                                             No.=FIELD(No.) }
+    { 97  ;SubForm      ;220  ;4290 ;16060;3300 ;Name=WhseActivityLines;
+                                                 HorzGlue=Both;
+                                                 VertGlue=Both;
+                                                 Border=No;
+                                                 FontName=p;
+                                                 SubFormID=Form60046;
+                                                 SubFormView=SORTING(Activity Type,No.,Sorting Sequence No.);
+                                                 SubFormLink=Activity Type=FIELD(Type),
+                                                             No.=FIELD(No.) }
+    { 98  ;CommandButton;14080;7810 ;2200 ;550  ;HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 PushAction=FormHelp }
+    { 100 ;MenuButton   ;6820 ;7810 ;2200 ;550  ;HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 CaptionML=[DAN=&Pluk;
+                                                            DEU=&Kommissionierung;
+                                                            ENU=P&ick;
+                                                            ESP=P&icking;
+                                                            FRA=&Pr�l�vement;
+                                                            ITA=P&relievo];
+                                                 Menu=MENUITEMS
+                                                 {
+                                                   { ID=101;
+                                                     ShortCutKey=F5;
+                                                     CaptionML=[DAN=Oversigt;
+                                                                DEU=�bersicht;
+                                                                ENU=List;
+                                                                ESP=Lista;
+                                                                FRA=Lister;
+                                                                ITA=Lista];
+                                                     OnPush=BEGIN
+                                                              IF FORM.RUNMODAL(FORM::"Reg Whse. Activity List Undo",Rec) = ACTION::LookupOK THEN;
+                                                            END;
+                                                             }
+                                                   { ID=10;
+                                                     PushAction=RunObject;
+                                                     CaptionML=[DAN=Be&m�rkninger;
+                                                                DEU=Be&merkungen;
+                                                                ENU=Co&mments;
+                                                                ESP=C&omentarios;
+                                                                FRA=Co&mmentaires;
+                                                                ITA=Co&mmenti];
+                                                     RunObject=Form 5776;
+                                                     RunFormLinkType=OnUpdate;
+                                                     RunFormLink=Table Name=CONST(Rgstrd. Whse. Activity Header),
+                                                                 Type=FIELD(Type),
+                                                                 No.=FIELD(No.) }
+                                                   { ID=20;
+                                                     CaptionML=[DAN=&Lagerposter;
+                                                                DEU=&Lagerplatzposten;
+                                                                ENU=&Warehouse Entries;
+                                                                ESP=&Movs. almac�n;
+                                                                FRA=�&critures entrep�t;
+                                                                ITA=Movimenti &warehouse];
+                                                     OnPush=BEGIN
+                                                              CurrForm.WhseActivityLines.FORM.ShowWhseEntries();
+                                                            END;
+                                                             }
+                                                   { ID=1000000000;
+                                                     CaptionML=ENU=Reverse Pick;
+                                                     OnPush=BEGIN
+                                                              //>>C2-1.15
+                                                              IF NOT CONFIRM(STRSUBSTNO(DGSText001,TABLECAPTION,FIELDCAPTION("No."),"No.")) THEN
+                                                                EXIT;
+                                                              CurrForm.WhseActivityLines.FORM.UndoRegWhsePick;
+                                                              MESSAGE(STRSUBSTNO(DGSText002,TABLECAPTION,FIELDCAPTION("No."),"No."));
+                                                              //<<C2-1.15
+                                                            END;
+                                                             }
+                                                 }
+                                                  }
+    { 6   ;MenuButton   ;9240 ;7810 ;2200 ;550  ;HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 CaptionML=[DAN=&Linje;
+                                                            DEU=&Zeile;
+                                                            ENU=&Line;
+                                                            ESP=&L�nea;
+                                                            FRA=&Ligne;
+                                                            ITA=Ri&ga];
+                                                 Menu=MENUITEMS
+                                                 {
+                                                   { ID=17;
+                                                     CaptionML=[DAN=&Kildedokumentlinje;
+                                                                DEU=&Herkunftsbelegzeile;
+                                                                ENU=Source &Document Line;
+                                                                ESP=L�n. &documento origen;
+                                                                FRA=Ligne document o&rigine;
+                                                                ITA=Riga &documento origine];
+                                                     OnPush=BEGIN
+                                                              CurrForm.WhseActivityLines.FORM.ShowSourceLine;
+                                                            END;
+                                                             }
+                                                   { ID=11;
+                                                     CaptionML=[DAN=Lagerdokumentlinje;
+                                                                DEU=Logistikbelegzeile;
+                                                                ENU=Whse. Document Line;
+                                                                ESP=L�n. documento &almac�n;
+                                                                FRA=Li&gne document entrep�t;
+                                                                ITA=Riga documento whse.];
+                                                     OnPush=BEGIN
+                                                              CurrForm.WhseActivityLines.FORM.ShowWhseLine;
+                                                            END;
+                                                             }
+                                                   { ID=18;
+                                                     CaptionML=[DAN=Bogf�rt lagerlev.linje;
+                                                                DEU=Geb. Warenausgangszeile;
+                                                                ENU=Posted Whse. Shipment Line;
+                                                                ESP=L�n. env�o almac�n re&gis.;
+                                                                FRA=Ligne exp�d. entrep. enreg.;
+                                                                ITA=Riga spedizione whse. reg.];
+                                                     OnPush=BEGIN
+                                                              CurrForm.WhseActivityLines.FORM.ShowPostedWhseShptLine;
+                                                            END;
+                                                             }
+                                                   { ID=19;
+                                                     MenuItemType=Separator }
+                                                   { ID=16;
+                                                     CaptionML=[DAN=Placeringsindh.ov.sigt;
+                                                                DEU=Lagerplatzinhalts�&bersicht;
+                                                                ENU=Bin Contents List;
+                                                                ESP=Lista contenidos u&bicaci�n;
+                                                                FRA=Liste contenus emplacement;
+                                                                ITA=Lista contenuto collocazione];
+                                                     OnPush=BEGIN
+                                                              CurrForm.WhseActivityLines.FORM.ShowBinContents;
+                                                            END;
+                                                             }
+                                                 }
+                                                  }
+    { 1000000001;MenuButton;11660;7810;2200;550 ;HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 CaptionML=[DAN=Fu&nktion;
+                                                            DEU=F&unktion;
+                                                            ENU=F&unctions;
+                                                            ESP=Acci&ones;
+                                                            FRA=Fonction&s;
+                                                            ITA=F&unzioni];
+                                                 Menu=MENUITEMS
+                                                 {
+                                                   { ID=1000000002;
+                                                     CaptionML=[DAN=Beregn Annuller Antal;
+                                                                ENU=Calculate Undo Quantity];
+                                                     OnPush=VAR
+                                                              RegWhseActLine@1000000002 : Record 5773;
+                                                              UndoWhseRegActivity@1000000000 : Codeunit 60005;
+                                                            BEGIN
+                                                              IF NOT CONFIRM(STRSUBSTNO(DGSText003,RegWhseActLine.FIELDCAPTION("Undo Quantity"),TABLECAPTION,FIELDCAPTION("No."),"No.")) THEN
+                                                                EXIT;
+                                                              UndoWhseRegActivity.CalculateUndoQtyHdr(Rec);
+                                                            END;
+                                                             }
+                                                 }
+                                                  }
+  }
+  CODE
+  {
+    VAR
+      CurrentLocationCode@1000 : Code[10];
+      DGSText001@1000000002 : TextConst 'DAN=Vil du annullere %1 %2 %3?;ENU=Do you want to undo %1 %2 %3?';
+      DGSText002@1000000001 : TextConst 'DAN=%1 %2 %3 blev annulleret!;ENU=%1 %2 %3 was undone!';
+      DGSText003@1000000000 : TextConst 'DAN=Opdater %1 p� %2 %3?;ENU=Update %1 on %2 %3?';
+
+    BEGIN
+    {
+      C2-1.15 - FMO  - 18.03.14 : CR-070 New form.
+    }
+    END.
+  }
+}
+

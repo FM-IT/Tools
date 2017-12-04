@@ -1,0 +1,288 @@
+OBJECT Codeunit 75000 CONFMO
+{
+  OBJECT-PROPERTIES
+  {
+    Date=28-08-13;
+    Time=15:18:54;
+    Modified=Yes;
+    Version List=NAVW15.00.01;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+            //LoadWindowsGroups('THINKPAD-FM\frank');
+            //LoadWindowsGroups('BUILTIN\Administratorer');
+            LoadWindowsGroups('THINKPAD-FM\Administrator');
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      TmpWindowsLoginGroup@1000 : TEMPORARY Record 2000000054;
+      MobXMLMgt@1005 : Codeunit 8704;
+      Text000@1003 : TextConst 'DAN=Brugeren %1 har ikke de kr‘vede rettigheder til %2 %3.;ENU=The user %1 does not have the required permissions for %2 %3.';
+
+    PROCEDURE CheckPermission@2(UserID@1000 : Text[65];ObjectType@1001 : Option;ObjectID@1002 : Integer;ReadPerm@1003 : ' ,Yes,Indirect';InsertPerm@1004 : ' ,Yes,Indirect';ModifyPerm@1005 : ' ,Yes,Indirect';DeletePerm@1006 : ' ,Yes,Indirect';ExecutePerm@1007 : ' ,Yes,Indirect');
+    VAR
+      Permission@1008 : Record 2000000005;
+    BEGIN
+      IF NOT CheckPermissionUserID(
+               UserID,ObjectType,ObjectID,
+               ReadPerm,InsertPerm,ModifyPerm,DeletePerm,ExecutePerm)
+      THEN BEGIN
+        Permission."Object Type" := ObjectType;
+        ERROR(Text000,UserID,Permission."Object Type",ObjectID);
+      END;
+    END;
+
+    LOCAL PROCEDURE CheckPermissionUserID@3(UserID@1000 : Text[65];ObjectType@1001 : Option;ObjectID@1002 : Integer;ReadPerm@1003 : ' ,Yes,Indirect';InsertPerm@1004 : ' ,Yes,Indirect';ModifyPerm@1005 : ' ,Yes,Indirect';DeletePerm@1006 : ' ,Yes,Indirect';ExecutePerm@1007 : ' ,Yes,Indirect') : Boolean;
+    VAR
+      WindowsLogin@1010 : Record 2000000054;
+      TmpPermission@1013 : TEMPORARY Record 2000000005;
+      XMLNodeList@1011 : Automation "{F5078F18-C551-11D3-89B9-0000F81FE221} 6.0:{2933BF82-7B36-11D2-B20E-00C04F983E60}:'Microsoft XML, v6.0'.IXMLDOMNodeList";
+      XMLNode@1009 : Automation "{F5078F18-C551-11D3-89B9-0000F81FE221} 6.0:{2933BF80-7B36-11D2-B20E-00C04F983E60}:'Microsoft XML, v6.0'.IXMLDOMNode";
+      ADGroupSID@1008 : Text[119];
+      NodeNo@1014 : Integer;
+    BEGIN
+      WindowsLogin.SETFILTER(ID,'@' + UserID);
+      IF WindowsLogin.FINDFIRST THEN
+        IF CheckPermissionSID(
+             TmpPermission,WindowsLogin.SID,ObjectType,ObjectID,
+             ReadPerm,InsertPerm,ModifyPerm,DeletePerm,ExecutePerm)
+        THEN
+          EXIT(TRUE);
+
+      TmpWindowsLoginGroup.RESET;
+      IF TmpWindowsLoginGroup.ISEMPTY THEN
+        LoadWindowsGroups(UserID);
+
+      IF TmpWindowsLoginGroup.FINDSET THEN
+        REPEAT
+          IF CheckPermissionSID(
+               TmpPermission,TmpWindowsLoginGroup.SID,ObjectType,ObjectID,
+               ReadPerm,InsertPerm,ModifyPerm,DeletePerm,ExecutePerm)
+          THEN
+            EXIT(TRUE);
+        UNTIL TmpWindowsLoginGroup.NEXT = 0;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE CheckPermissionSID@4(VAR AccumulatedPermission@1010 : Record 2000000005;SID@1000 : Text[119];ObjectType@1001 : Option;ObjectID@1002 : Integer;ReadPerm@1003 : ' ,Yes,Indirect';InsertPerm@1004 : ' ,Yes,Indirect';ModifyPerm@1005 : ' ,Yes,Indirect';DeletePerm@1006 : ' ,Yes,Indirect';ExecutePerm@1007 : ' ,Yes,Indirect') : Boolean;
+    VAR
+      WindowsAccessControl@1008 : Record 2000000053;
+      Permission@1009 : Record 2000000005;
+    BEGIN
+      WindowsAccessControl.SETRANGE("Login SID",SID);
+      WindowsAccessControl.SETFILTER("Company Name",'%1|%2','',COMPANYNAME);
+      IF WindowsAccessControl.FINDSET THEN BEGIN
+        Permission.SETRANGE("Object Type",ObjectType);
+        Permission.SETFILTER("Object ID",'%1|%2',0,ObjectID);
+        Permission.SETRANGE("Security Filter",Permission."Security Filter"); // To prevent elevated privileges
+        REPEAT
+          Permission.SETRANGE("Role ID",WindowsAccessControl."Role ID");
+          IF Permission.FINDSET THEN
+            REPEAT
+              AccumulatePermission(AccumulatedPermission,Permission);
+              IF RequirementsFulfilled(AccumulatedPermission,ReadPerm,InsertPerm,ModifyPerm,DeletePerm,ExecutePerm) THEN
+                EXIT(TRUE)
+            UNTIL Permission.NEXT = 0;
+        UNTIL WindowsAccessControl.NEXT = 0;
+      END;
+
+      EXIT(FALSE);
+    END;
+
+    LOCAL PROCEDURE AccumulatePermission@5(VAR AccumulatedPermission@1001 : Record 2000000005;Permission@1000 : Record 2000000005);
+    VAR
+      FirstPermission@1002 : Boolean;
+    BEGIN
+      AccumulatedPermission.RESET;
+      IF AccumulatedPermission.ISEMPTY THEN BEGIN
+        AccumulatedPermission.INIT;
+        AccumulatedPermission."Read Permission" := AccumulatedPermission."Read Permission"::" ";
+        AccumulatedPermission."Insert Permission" := AccumulatedPermission."Insert Permission"::" ";
+        AccumulatedPermission."Modify Permission" := AccumulatedPermission."Modify Permission"::" ";
+        AccumulatedPermission."Delete Permission" := AccumulatedPermission."Delete Permission"::" ";
+        AccumulatedPermission."Execute Permission" := AccumulatedPermission."Execute Permission"::" ";
+        FirstPermission := TRUE;
+      END;
+
+      AccumulatePermissionField(AccumulatedPermission."Read Permission",Permission."Read Permission");
+      AccumulatePermissionField(AccumulatedPermission."Insert Permission",Permission."Insert Permission");
+      AccumulatePermissionField(AccumulatedPermission."Modify Permission",Permission."Modify Permission");
+      AccumulatePermissionField(AccumulatedPermission."Delete Permission",Permission."Delete Permission");
+      AccumulatePermissionField(AccumulatedPermission."Execute Permission",Permission."Execute Permission");
+
+      IF FirstPermission THEN
+        AccumulatedPermission.INSERT
+      ELSE
+        AccumulatedPermission.MODIFY;
+    END;
+
+    LOCAL PROCEDURE AccumulatePermissionField@7(VAR AccumulatedPermission@1001 : ' ,Yes,Indirect';NewPermission@1000 : ' ,Yes,Indirect');
+    BEGIN
+      CASE AccumulatedPermission OF
+        AccumulatedPermission::" ":
+          BEGIN
+            AccumulatedPermission := NewPermission;
+          END;
+        AccumulatedPermission::Indirect:
+          BEGIN
+            IF NewPermission = NewPermission::Yes THEN
+              AccumulatedPermission := NewPermission
+          END;
+      END;
+    END;
+
+    LOCAL PROCEDURE RequirementsFulfilled@6(VAR AccumulatedPermission@1005 : Record 2000000005;ReadPerm@1004 : ' ,Yes,Indirect';InsertPerm@1003 : ' ,Yes,Indirect';ModifyPerm@1002 : ' ,Yes,Indirect';DeletePerm@1001 : ' ,Yes,Indirect';ExecutePerm@1000 : ' ,Yes,Indirect') : Boolean;
+    BEGIN
+      AccumulatedPermission.RESET;
+      AccumulatedPermission.SETFILTER("Read Permission",PermissionFilter(ReadPerm));
+      AccumulatedPermission.SETFILTER("Insert Permission",PermissionFilter(InsertPerm));
+      AccumulatedPermission.SETFILTER("Modify Permission",PermissionFilter(ModifyPerm));
+      AccumulatedPermission.SETFILTER("Delete Permission",PermissionFilter(DeletePerm));
+      AccumulatedPermission.SETFILTER("Execute Permission",PermissionFilter(ExecutePerm));
+      EXIT(NOT AccumulatedPermission.ISEMPTY)
+    END;
+
+    LOCAL PROCEDURE PermissionFilter@1(RequiredPermission@1000 : ' ,Yes,Indirect') : Text[50];
+    VAR
+      Permission@1001 : Record 2000000005;
+    BEGIN
+      CASE RequiredPermission OF
+        RequiredPermission::" ":
+          EXIT('');
+        RequiredPermission::Yes:
+          BEGIN
+            Permission.SETRANGE("Read Permission",Permission."Read Permission"::Yes);
+            EXIT(Permission.GETFILTER("Read Permission"));
+          END;
+        RequiredPermission::Indirect:
+          BEGIN
+            Permission.SETRANGE("Read Permission",Permission."Read Permission"::Yes,Permission."Read Permission"::Indirect);
+            EXIT(Permission.GETFILTER("Read Permission"));
+          END;
+      END;
+    END;
+
+    LOCAL PROCEDURE LoadWindowsGroups@12(UserID@1000 : Text[250]);
+    VAR
+      SIDNodeNo@1009 : Integer;
+      RowNodeNo@1000000001 : Integer;
+      ADOConnection@1008 : Automation "{2A75196C-D9EB-4129-B803-931327F72D5C} 2.8:{00000514-0000-0010-8000-00AA006D2EA4}:'Microsoft ActiveX Data Objects 2.8 Library'.Connection";
+      ADOCommand@1007 : Automation "{2A75196C-D9EB-4129-B803-931327F72D5C} 2.8:{00000507-0000-0010-8000-00AA006D2EA4}:'Microsoft ActiveX Data Objects 2.8 Library'.Command";
+      ADOParameters@1006 : Automation "{2A75196C-D9EB-4129-B803-931327F72D5C} 2.8:{0000050D-0000-0010-8000-00AA006D2EA4}:'Microsoft ActiveX Data Objects 2.8 Library'.Parameters";
+      ADOParameter@1005 : Automation "{2A75196C-D9EB-4129-B803-931327F72D5C} 2.8:{0000050B-0000-0010-8000-00AA006D2EA4}:'Microsoft ActiveX Data Objects 2.8 Library'.Parameter";
+      ADORecordSet@1004 : Automation "{2A75196C-D9EB-4129-B803-931327F72D5C} 2.8:{00000535-0000-0010-8000-00AA006D2EA4}:'Microsoft ActiveX Data Objects 2.8 Library'.Recordset";
+      XMLDoc@1003 : Automation "{F5078F18-C551-11D3-89B9-0000F81FE221} 6.0:{88D96A05-F192-11D4-A65F-0040963251E5}:'Microsoft XML, v6.0'.DOMDocument60";
+      XMLNodelist@1002 : Automation "{F5078F18-C551-11D3-89B9-0000F81FE221} 6.0:{2933BF82-7B36-11D2-B20E-00C04F983E60}:'Microsoft XML, v6.0'.IXMLDOMNodeList";
+      XMLNode@1001 : Automation "{F5078F18-C551-11D3-89B9-0000F81FE221} 6.0:{2933BF80-7B36-11D2-B20E-00C04F983E60}:'Microsoft XML, v6.0'.IXMLDOMNode";
+      XMLNode2@1000000002 : Automation "{F5078F18-C551-11D3-89B9-0000F81FE221} 6.0:{2933BF80-7B36-11D2-B20E-00C04F983E60}:'Microsoft XML, v6.0'.IXMLDOMNode";
+      XMLDomNamedNodeMap@1000000000 : Automation "{F5078F18-C551-11D3-89B9-0000F81FE221} 6.0:{2933BF83-7B36-11D2-B20E-00C04F983E60}:'Microsoft XML, v6.0'.IXMLDOMNamedNodeMap";
+      SIDType@1000000003 : Text[30];
+    BEGIN
+      IF ISCLEAR(ADOConnection) THEN
+        CREATE(ADOConnection);
+      IF ISCLEAR(ADOCommand) THEN
+        CREATE(ADOCommand);
+      IF ISCLEAR(XMLDoc) THEN
+        CREATE(XMLDoc);
+
+      ADOConnection.Open(
+        STRSUBSTNO(
+          'Provider=SQLOLEDB;Data Source=%1;Initial Catalog=%2;Integrated Security=SSPI;',
+          ContextUrlValue('servername'),ContextUrlValue('database')));
+      ADOCommand.ActiveConnection := ADOConnection.ConnectionString;
+      ADOCommand.CommandText:='[master]..[xp_ndo_enumusergroups]';
+      ADOCommand.CommandTimeout := 0;
+      ADOCommand.CommandType := 4;
+      ADOParameters := ADOCommand.Parameters;
+      ADOParameter := ADOCommand.CreateParameter('@UserName',200,1,250,UserID);
+      ADOParameters.Append(ADOParameter);
+      ADOParameter := ADOCommand.CreateParameter('@UserSIDOnly',16,1,1,0);
+      ADOParameters.Append(ADOParameter);
+      ADORecordSet := ADOCommand.Execute;
+
+      ADORecordSet.Save(XMLDoc,1);
+
+      //>>
+      //XMLNodelist := XMLDoc.selectNodes('//@sid');
+      //FOR SIDNodeNo := 1 TO XMLNodelist.length DO BEGIN
+      //  XMLNode := XMLNodelist.item(SIDNodeNo - 1);
+      //  TmpWindowsLoginGroup.INIT;
+      //  TmpWindowsLoginGroup.SID := RawSID2StringSID(XMLNode.text);
+      //  TmpWindowsLoginGroup.INSERT;
+      //END;
+      XMLNodelist := XMLDoc.getElementsByTagName('z:row');
+      FOR RowNodeNo := 1 TO XMLNodelist.length DO BEGIN
+        XMLNode := XMLNodelist.item(RowNodeNo - 1);
+        XMLDomNamedNodeMap := XMLNode.attributes;
+        TmpWindowsLoginGroup.INIT;
+        XMLNode2 := XMLDomNamedNodeMap.getNamedItem('type');
+        SIDType := XMLNode2.text;
+        XMLNode2 := XMLDomNamedNodeMap.getNamedItem('sid');
+        TmpWindowsLoginGroup.SID := RawSID2StringSID(XMLNode2.text);
+        XMLNode2 := XMLDomNamedNodeMap.getNamedItem('name');
+        TmpWindowsLoginGroup.Name := XMLNode2.text;
+        TmpWindowsLoginGroup.INSERT;
+      END;
+      //<<
+
+      ADOConnection.Close;
+    END;
+
+    LOCAL PROCEDURE ContextUrlValue@11(Name@1000 : Text[30]) Value : Text[250];
+    BEGIN
+      Value := COPYSTR(CONTEXTURL,STRPOS(CONTEXTURL,Name + '=') + STRLEN(Name) + 1);
+      EXIT(COPYSTR(Value,1,STRPOS(Value,'&') - 1));
+    END;
+
+    LOCAL PROCEDURE RawSID2StringSID@9(RawSID@1000 : Text[85]) StringSID : Text[120];
+    VAR
+      IntArrNo@1002 : Integer;
+      SubAuthorityCount@1004 : Integer;
+      SubAuthorityNo@1005 : Integer;
+      Idx@1006 : Integer;
+      Int@1003 : BigInteger;
+      IntArr@1001 : ARRAY [43] OF BigInteger;
+    BEGIN
+      RawSID := LOWERCASE(RawSID);
+
+      FOR IntArrNo := 1 TO STRLEN(RawSID) DIV 2 DO BEGIN
+        IntArr[IntArrNo] := 16 * Hex2Dec(RawSID[IntArrNo * 2 - 1]);
+        IntArr[IntArrNo] := IntArr[IntArrNo] + Hex2Dec(RawSID[IntArrNo * 2]);
+      END;
+
+      StringSID := 'S-' + FORMAT(IntArr[1]);
+
+      SubAuthorityCount := IntArr[2];
+
+      IF (IntArr[3] <> 0) OR (IntArr[4] <> 0) THEN
+        StringSID := '-0x' + COPYSTR(RawSID,5,12)
+      ELSE BEGIN
+        Int := IntArr[8] + IntArr[7] * 256 + IntArr[6] * 256 * 256 + IntArr[5] * 256 * 256 * 256;
+        StringSID := StringSID + '-' + FORMAT(Int);
+      END;
+
+      FOR SubAuthorityNo := 0 TO SubAuthorityCount - 1 DO BEGIN
+        Idx := 9 + SubAuthorityNo * 4;
+        Int := IntArr[Idx] + IntArr[Idx + 1] * 256 + IntArr[Idx + 2] * 256 * 256 + IntArr[Idx + 3] * 256 * 256 * 256;
+        StringSID := StringSID + '-' + FORMAT(Int);
+      END;
+    END;
+
+    LOCAL PROCEDURE Hex2Dec@8(Hex@1000 : Char) : Integer;
+    BEGIN
+      CASE Hex OF
+        '0'..'9': EXIT(Hex - 48);
+        'a'..'f': EXIT(Hex - 87);
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

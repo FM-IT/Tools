@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.fm-it.dk/Dynamics/Mobile/2009/01/Tasklets/UpdatePick" xmlns:NS="http://schemas.fm-it.dk/Dynamics/Mobile/2009/01/Tasklets/UpdatePick" targetNamespace="http://schemas.fm-it.dk/Dynamics/Mobile/2009/01/Tasklets/UpdatePick">
+  <xs:element name="pick">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="pickProperties">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="version" type="xs:decimal" />
+              <xs:element name="docPurpose" type="xs:string" />
+              <xs:element name="requestDateTime" type="xs:dateTime" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="PickHeaders">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="PickHeaderProperties">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="ActivityType" type="xs:string" />
+                    <xs:element name="Number" type="xs:string" />
+                    <xs:element name="AssignedUserID" type="xs:string" />
+                    <xs:element name="AssignmentDate" type="xs:dateTime" />
+                    <xs:element name="AssignmentTime" type="xs:dateTime" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="PickLines">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="PickLine">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="PickLineProperties">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="ActivityType" type="xs:string" />
+                                <xs:element name="Number" type="xs:decimal" />
+                                <xs:element name="LineNumber" type="xs:string" />
+                                <xs:element name="QtyToHandle" type="xs:unsignedByte" />
+                                <xs:element name="DueDate" type="xs:decimal" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
